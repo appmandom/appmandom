@@ -3,7 +3,6 @@
 - 🌱 I’m currently learning how to make an NFT smart contract.
 - 💞️ I’m looking to collaborate on creating NFT's and selling them. I also want to create a B2B solution using smart contracts as a basis to help businesses collaborate based on their knowledge and skills.
 
-- 📫 How to reach me: @dzbusselot@gmail.com
 
 <!---
 appmandom/appmandom is a ✨ special ✨ repository because its `README.md` (this file) appears on your GitHub profile.

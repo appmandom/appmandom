@@ -23,7 +23,8 @@
   --max: 760px;
 }
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
     --bg: #111411;
     --surface: #1a1f1a;
     --surface-2: #222822;
@@ -43,6 +44,27 @@
     --done: #8a8981;
     --shadow: 0 1px 2px rgba(0,0,0,.4), 0 6px 20px rgba(0,0,0,.35);
   }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #111411;
+  --surface: #1a1f1a;
+  --surface-2: #222822;
+  --text: #ecebe5;
+  --muted: #a8a79e;
+  --border: #2d342d;
+  --primary: #45b87e;
+  --primary-hover: #5cc990;
+  --primary-ink: #08170f;
+  --accent: #ff5c6c;
+  --soft: #172a1e;
+  --soft-ink: #bfe8d0;
+  --info-bg: #182333;
+  --info-ink: #b9d0f2;
+  --warn-bg: #2b2210;
+  --warn-ink: #f2cf7a;
+  --done: #8a8981;
+  --shadow: 0 1px 2px rgba(0,0,0,.4), 0 6px 20px rgba(0,0,0,.35);
 }
 
 * { box-sizing: border-box; }
@@ -73,7 +95,7 @@ hr { border: 0; border-top: 1px solid var(--border); margin: 1.5em 0; }
 .skip:focus { left: 8px; top: 8px; }
 
 /* Header */
-.site-header { position: sticky; top: 0; z-index: 20; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); }
+.site-header { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); }
 .header-inner { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 56px; }
 .brand { font-weight: 700; text-decoration: none; color: var(--text); white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; }
 .brand-mark { font-size: 1.2em; }
@@ -89,7 +111,7 @@ hr { border: 0; border-top: 1px solid var(--border); margin: 1.5em 0; }
   .nav a { padding: 7px 9px; font-size: .9rem; }
 }
 
-main { padding: 20px 16px 48px; min-height: 60vh; }
+main { padding-block: 20px 48px; min-height: 60vh; }
 main:focus { outline: none; }
 
 /* Footer */
@@ -214,3 +236,10 @@ main:focus { outline: none; }
   .task, .card { box-shadow: none; break-inside: avoid; }
   a[href^="http"]::after { content: " (" attr(href) ")"; font-size: .8em; color: #555; }
 }
+
+/* In-page confirmation (replaces window.confirm) */
+.confirm-box { margin: 10px 0 4px; padding: 12px 14px; border-radius: var(--radius-sm); background: var(--warn-bg); color: var(--warn-ink); }
+.confirm-box p { margin: 0 0 10px; }
+.confirm-box .btn-row { margin: 0; }
+button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }

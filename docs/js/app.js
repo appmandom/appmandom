@@ -5,7 +5,11 @@
   const SPT = window.SPT = window.SPT || {};
   const $app = document.getElementById('app');
   const SITE = 'Settle in Portugal';
-  const ISSUES_URL = 'https://github.com/appmandom/appmandom/issues';
+  // Where "Report an error" / "Send feedback" links point. While the repo is private, visitors cannot open GitHub issues,
+// so this can be swapped for a public form (e.g. a Google Form) during the feedback phase.
+const ISSUES_URL = 'https://github.com/appmandom/settle-in-portugal/issues';
+// Embedded preview (claude.ai artifact) sets window.SPT_EMBED: printing is unavailable there, comments are.
+const EMBED = !!window.SPT_EMBED;
 
   /* ---------- helpers ---------- */
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -171,8 +175,12 @@
       <div class="btn-row no-print">
         <a class="btn btn-sm" href="#/start">Edit answers</a>
         <button type="button" class="btn btn-sm" data-action="copy-plan">Copy as text</button>
-        <button type="button" class="btn btn-sm" data-action="print">Print / save PDF</button>
+        ${EMBED ? '' : '<button type="button" class="btn btn-sm" data-action="print">Print / save PDF</button>'}
         <button type="button" class="btn btn-sm btn-ghost" data-action="reset">Start over</button>
+      </div>
+      <div class="confirm-box" id="reset-confirm" hidden>
+        <p>Delete your answers and ticked steps from this device?</p>
+        <div class="btn-row"><button type="button" class="btn btn-sm btn-primary" data-action="reset-yes">Yes, start over</button><button type="button" class="btn btn-sm" data-action="reset-no">Keep my plan</button></div>
       </div>
       ${plan.phases.map(p => `
         <section class="phase" id="phase-${p.id}">
@@ -385,10 +393,12 @@
     } else if (act === 'print') {
       window.print();
     } else if (act === 'reset') {
-      if (confirm('Delete your answers and progress from this device?')) {
-        store.del('answers'); store.del('done');
-        location.hash = '#/start';
-      }
+      const box = document.getElementById('reset-confirm'); if (box) box.hidden = false;
+    } else if (act === 'reset-no') {
+      const box = document.getElementById('reset-confirm'); if (box) box.hidden = true;
+    } else if (act === 'reset-yes') {
+      store.del('answers'); store.del('done');
+      location.hash = '#/start';
     }
   });
 
@@ -437,6 +447,21 @@
       document.body.appendChild(ta); ta.select();
       try { document.execCommand('copy') ? res() : rej(); } catch (e) { rej(e); } finally { ta.remove(); }
     });
+  }
+
+  /* Footer feedback: comment box on the embedded preview, issues link elsewhere. */
+  const fbLink = document.getElementById('feedback-link');
+  if (fbLink) { fbLink.href = ISSUES_URL; fbLink.target = '_blank'; fbLink.rel = 'noopener noreferrer'; }
+  if (window.claude && typeof window.claude.use === 'function') {
+    window.claude.use('comments').then(comments => {
+      const btn = document.getElementById('feedback-btn');
+      if (!comments || !btn) return;
+      btn.hidden = false;
+      btn.addEventListener('click', () => {
+        const target = document.querySelector('main h1') || document.getElementById('app');
+        Promise.resolve(comments.openComposer({ element: target })).catch(() => toast('Tap the comment icon at the top of the page to leave feedback'));
+      });
+    }).catch(() => {});
   }
 
   window.addEventListener('hashchange', route);
